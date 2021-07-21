@@ -3,10 +3,8 @@
 
 namespace Seatplus\Notifications\Notifications;
 
-
 interface DescribeNotificationInterface
 {
-
     /**
      * Should return the heroicon name
      * https://unpkg.com/browse/@heroicons/vue@1.0.2/outline/

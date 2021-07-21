@@ -1,8 +1,8 @@
 <?php
 
+use function Pest\Laravel\actingAs;
 use Seatplus\Eveapi\Models\Mail\Mail;
 use Seatplus\Eveapi\Models\Mail\MailRecipients;
-use function Pest\Laravel\actingAs;
 
 it('redirects to first notification package', function () {
     //$user = $this->test_user;
@@ -12,13 +12,12 @@ it('redirects to first notification package', function () {
         value: [
             [
                 'name' => 'Test Channel',
-                'route' => 'auth.login'
-            ]
+                'route' => 'auth.login',
+            ],
         ]
     );
 
     actingAs($this->test_user)->get(route('notifications.index'))->assertRedirect();
-
 });
 
 test('one can subscribe to new eve mail notifications', function () {
@@ -46,7 +45,7 @@ test('one can subscribe to new eve mail notifications', function () {
             'character_ids' => [$this->test_character->character_id],
             'corporation_ids' => [],
             'alliance_ids' => [],
-        ]
+        ],
     ])->assertRedirect();
 
     expect(\Seatplus\Notifications\Models\Subscription::all())->toHaveCount(1);
@@ -60,10 +59,9 @@ test('one can subscribe to new eve mail notifications', function () {
         'corporation_ids' => [],
         'alliance_ids' => [],
     ]);
-
 });
 
-test('creates an outbox entry for subscribed entities, whenever a new eve mail is created', function (){
+test('creates an outbox entry for subscribed entities, whenever a new eve mail is created', function () {
     $response = actingAs($this->test_user)->post(route('notification.subscribe'), [
         'notification' => \Seatplus\Notifications\Tests\Stubs\TestEveMail::class,
         'notifiable_id' => $this->test_user->id,
@@ -72,19 +70,19 @@ test('creates an outbox entry for subscribed entities, whenever a new eve mail i
             'character_ids' => [$this->test_character->character_id],
             'corporation_ids' => [],
             'alliance_ids' => [],
-        ]
+        ],
     ])->assertRedirect();
 
     // simulate cached name result for from_id
-    cache()->set('name:1337', ['name'=>'LeetName']);
+    cache()->set('name:1337', ['name' => 'LeetName']);
 
     $mail = Mail::factory()
         ->has(MailRecipients::factory()->count(1)->state([
             'receivable_id' => $this->test_character->character_id,
-            'receivable_type' => \Seatplus\Eveapi\Models\Character\CharacterInfo::class
+            'receivable_type' => \Seatplus\Eveapi\Models\Character\CharacterInfo::class,
         ]), 'recipients')
         ->create([
-            'from' => 1337
+            'from' => 1337,
         ]);
 
     event(new \Seatplus\Eveapi\Events\EveMailCreated($mail->id));

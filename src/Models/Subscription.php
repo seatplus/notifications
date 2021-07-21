@@ -12,6 +12,6 @@ class Subscription extends Model
     protected $guarded = [];
 
     protected $casts = [
-        'affiliated_entities' => 'array'
+        'affiliated_entities' => 'array',
     ];
 }

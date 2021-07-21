@@ -57,7 +57,7 @@ class TestCase extends Orchestra
             NotificationsServiceProvider::class,
             AuthenticationServiceProvider::class,
             EveapiServiceProvider::class,
-            WebServiceProvider::class
+            WebServiceProvider::class,
         ];
     }
 

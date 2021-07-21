@@ -3,12 +3,10 @@
 
 namespace Seatplus\Notifications\Tests\Stubs;
 
-
 use Seatplus\Notifications\Notifications\NewEveMail;
 
 class TestEveMail extends NewEveMail
 {
-
     public static function getIcon(): string
     {
         return 'icon';

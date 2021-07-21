@@ -2,12 +2,9 @@
 
 namespace Seatplus\Notifications;
 
-use Illuminate\Support\Facades\Config;
 use Illuminate\Support\ServiceProvider;
 use Seatplus\Eveapi\Events\EveMailCreated;
-use Seatplus\Eveapi\Models\Mail\Mail;
 use Seatplus\Notifications\Listeners\EveMailListener;
-use Seatplus\Notifications\Observers\EveMailObserver;
 
 class NotificationsServiceProvider extends ServiceProvider
 {
@@ -41,20 +38,20 @@ class NotificationsServiceProvider extends ServiceProvider
 
     private function mergeConfigurations()
     {
-
         $this->mergeConfigFrom(
             __DIR__ . '/../config/package.sidebar.php',
             'package.sidebar'
         );
 
         $this->mergeConfigFrom(
-            __DIR__ . '/../config/notification.channels.php', 'notification.channel'
+            __DIR__ . '/../config/notification.channels.php',
+            'notification.channel'
         );
 
         $this->mergeConfigFrom(
-            __DIR__ . '/../config/notification.permissions.php', 'web.permissions'
+            __DIR__ . '/../config/notification.permissions.php',
+            'web.permissions'
         );
-
     }
 
     private function addPublications()
@@ -71,7 +68,6 @@ class NotificationsServiceProvider extends ServiceProvider
 
     private function addEventListeners()
     {
-
         app('events')->listen(EveMailCreated::class, EveMailListener::class);
         //$this->app->events->listen(EveMailCreated::class, EveMailListener::class);
     }

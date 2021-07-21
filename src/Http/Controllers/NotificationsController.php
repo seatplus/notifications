@@ -3,7 +3,6 @@
 
 namespace Seatplus\Notifications\Http\Controllers;
 
-
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
@@ -23,7 +22,6 @@ class NotificationsController
 
     public function affiliatedCharacters(Request $request)
     {
-
         $class = $this->getNotificationClass($request);
 
         $affiliated_ids = getAffiliatedIdsByPermission($class::getPermission(), $class::getCorporationRole());
@@ -32,7 +30,6 @@ class NotificationsController
             ->select('character_id')
             ->whereIn('character_id', $affiliated_ids)
             ->pluck('character_id');
-
     }
 
     public function currentSubscription(Request $request)
@@ -49,15 +46,15 @@ class NotificationsController
             'notifiable_type' => data_get($validated_data, 'notifiable_type'),
         ]);
 
-        if(is_null($subscription))
+        if (is_null($subscription)) {
             return [
                 'character_ids' => [],
                 'corporation_ids' => [],
                 'alliance_ids' => [],
             ];
+        }
 
         return $subscription->affiliated_entities;
-
     }
 
     public function subscribe(Request $request)
@@ -66,18 +63,19 @@ class NotificationsController
             'notification' => ['required', 'string'],
             'notifiable_id' => ['required', 'numeric'],
             'notifiable_type' => ['required', 'string'],
-            'affiliated_entities' => ['required', 'array', function($attribute, $value, $fail) use ($request) {
+            'affiliated_entities' => ['required', 'array', function ($attribute, $value, $fail) use ($request) {
                 $ids = [
                     ...data_get($value, 'character_ids'),
                     ...data_get($value, 'corporation_ids'),
-                    ...data_get($value, 'alliance_ids')
+                    ...data_get($value, 'alliance_ids'),
                 ];
 
                 $notification = $request->get('notification');
                 $affiliated_ids = getAffiliatedIdsByPermission($notification::getPermission(), $notification::getCorporationRole());
 
-                if(collect($ids)->intersect($affiliated_ids)->isEmpty())
+                if (collect($ids)->intersect($affiliated_ids)->isEmpty()) {
                     $fail("You try to subscribe to entities which are not affiliated to you");
+                }
             }],
         ]);
 
@@ -95,7 +93,7 @@ class NotificationsController
     private function getNotificationClass(Request $request) : string
     {
         $validated_data = $request->validate([
-            'notification' => ['required', 'string']
+            'notification' => ['required', 'string'],
         ]);
 
         $class = data_get($validated_data, 'notification');

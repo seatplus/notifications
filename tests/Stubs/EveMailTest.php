@@ -7,5 +7,4 @@ use Seatplus\Notifications\Tests\TestCase;
 
 class EveMailTest extends TestCase
 {
-
 }
