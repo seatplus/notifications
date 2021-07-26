@@ -1,10 +1,10 @@
 <?php
 
 use Illuminate\Support\Facades\Queue;
-use Seatplus\Notifications\Jobs\NewEveMail;
 use function Pest\Laravel\actingAs;
 use Seatplus\Eveapi\Models\Mail\Mail;
 use Seatplus\Eveapi\Models\Mail\MailRecipients;
+use Seatplus\Notifications\Jobs\NewEveMail;
 
 it('redirects to first notification package', function () {
     //$user = $this->test_user;
@@ -64,7 +64,6 @@ test('one can subscribe to new eve mail notifications', function () {
 });
 
 it('dispatches a helper job, whenever a new eve mail is created', function () {
-
     Queue::fake();
 
     Queue::assertNothingPushed();
@@ -82,7 +81,6 @@ it('dispatches a helper job, whenever a new eve mail is created', function () {
 });
 
 test('helper job delays notification creation if recipients are not ready', function () {
-
     Queue::fake();
 
     Queue::assertNothingPushed();
@@ -96,7 +94,7 @@ test('helper job delays notification creation if recipients are not ready', func
             'from' => 1337,
         ]);
 
-    $job = Mockery::mock(NewEveMail::class,[$mail])->makePartial();
+    $job = Mockery::mock(NewEveMail::class, [$mail])->makePartial();
     $job->shouldReceive('release')
         ->once();
 

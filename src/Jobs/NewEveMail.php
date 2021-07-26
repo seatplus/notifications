@@ -21,8 +21,10 @@ use Seatplus\Web\Services\GetNamesFromIdsService;
 
 class NewEveMail implements ShouldQueue, ShouldBeUnique
 {
-
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Dispatchable;
+    use InteractsWithQueue;
+    use Queueable;
+    use SerializesModels;
 
     /**
      * Determine the time at which the job should timeout.
@@ -36,13 +38,12 @@ class NewEveMail implements ShouldQueue, ShouldBeUnique
 
     public function __construct(
         protected Mail $mail
-    )
-    {
+    ) {
     }
 
     public function handle()
     {
-        if($this->mail->recipients->isEmpty()) {
+        if ($this->mail->recipients->isEmpty()) {
             return $this->release(30);
         }
 
@@ -75,8 +76,6 @@ class NewEveMail implements ShouldQueue, ShouldBeUnique
                 'is_sent' => false,
             ]);
         }
-
-
     }
 
     private function getAffiliatedIds(array $affiliated_ids) : Collection
@@ -105,5 +104,4 @@ class NewEveMail implements ShouldQueue, ShouldBeUnique
 
         return $ids->unique();
     }
-
 }

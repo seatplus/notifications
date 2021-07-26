@@ -5,7 +5,6 @@ use Seatplus\Notifications\Models\Outbox;
 use Seatplus\Notifications\Tests\Stubs\TestEveMail;
 
 beforeEach(function () {
-
     $notification = new TestEveMail(
         1337,
         'TestName',
@@ -29,4 +28,3 @@ it('it has notifiable relationship defined', function () {
 it('it has mutators for accessing and storing notifications', function () {
     expect(Outbox::first()->notification instanceof TestEveMail)->toBeTrue();
 });
-
