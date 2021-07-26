@@ -52,7 +52,7 @@ class EveMailListener
                 'notifiable_type' => $subscription->notifiable_type,
                 'notifiable_id' => $subscription->notifiable_id,
                 'notification' => serialize($notification),
-                'is_send' => false,
+                'is_sent' => false,
             ]);
         }
     }
