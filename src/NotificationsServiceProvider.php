@@ -3,8 +3,8 @@
 namespace Seatplus\Notifications;
 
 use Illuminate\Support\ServiceProvider;
-use Seatplus\Eveapi\Events\EveMailCreated;
-use Seatplus\Notifications\Listeners\EveMailListener;
+use Seatplus\Eveapi\Models\Mail\Mail;
+use Seatplus\Notifications\Observers\EveMailObserver;
 
 class NotificationsServiceProvider extends ServiceProvider
 {
@@ -68,7 +68,6 @@ class NotificationsServiceProvider extends ServiceProvider
 
     private function addEventListeners()
     {
-        app('events')->listen(EveMailCreated::class, EveMailListener::class);
-        //$this->app->events->listen(EveMailCreated::class, EveMailListener::class);
+        Mail::observe(EveMailObserver::class);
     }
 }

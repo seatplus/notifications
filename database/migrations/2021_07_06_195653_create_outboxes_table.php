@@ -17,7 +17,7 @@ class CreateOutboxesTable extends Migration
             $table->id();
             $table->morphs('notifiable');
             $table->json('notification');
-            $table->boolean('is_send');
+            $table->boolean('is_sent');
             $table->timestamps();
         });
     }

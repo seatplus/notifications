@@ -26,6 +26,8 @@ jobs:
           redis-version: 6 # optional, default is latest, was 5
       - name: Install Dependencies
         run: composer install --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+      - name: Run test & coverage
+        run: vendor/bin/pest --coverage --min=85
 #      - name: Test & publish code coverage
 #        uses: paambaati/codeclimate-action@v2.6.0
 #        env:

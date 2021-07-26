@@ -1,58 +1,79 @@
 <?php
 
 
-namespace Seatplus\Notifications\Listeners;
+namespace Seatplus\Notifications\Jobs;
 
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldBeUnique;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Collection;
 use ReflectionClass;
-use Seatplus\Eveapi\Events\EveMailCreated;
 use Seatplus\Eveapi\Models\Alliance\AllianceInfo;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Eveapi\Models\Mail\Mail;
 use Seatplus\Notifications\Models\Outbox;
 use Seatplus\Notifications\Models\Subscription;
-use Seatplus\Notifications\Notifications\NewEveMail;
 use Seatplus\Web\Services\GetNamesFromIdsService;
 
-class EveMailListener
+class NewEveMail implements ShouldQueue, ShouldBeUnique
 {
-    public function handle(EveMailCreated $event)
-    {
-        $mail = Mail::findOrFail($event->mail_id);
+    use Dispatchable;
+    use InteractsWithQueue;
+    use Queueable;
+    use SerializesModels;
 
-        $this->created($mail);
+    /**
+     * Determine the time at which the job should timeout.
+     *
+     * @return \DateTime
+     */
+    public function retryUntil()
+    {
+        return now()->addHours(12);
     }
 
-    public function created(Mail $mail)
+    public function __construct(
+        protected Mail $mail
+    ) {
+    }
+
+    public function handle()
     {
+        if ($this->mail->recipients->isEmpty()) {
+            return $this->release(30);
+        }
+
         $subscriptions = Subscription::cursor()->filter(function ($subscription) {
             $reflector = new ReflectionClass($subscription->notification);
 
-            return $reflector->isSubclassOf(NewEveMail::class);
-        })->filter(function (Subscription $subscription) use ($mail) {
-            return $mail->recipients->pluck('receivable_id')
+            return $reflector->isSubclassOf(\Seatplus\Notifications\Notifications\NewEveMail::class);
+        })->filter(function (Subscription $subscription) {
+            return $this->mail->recipients->pluck('receivable_id')
                 ->intersect($this->getAffiliatedIds($subscription->affiliated_entities))
                 ->isNotEmpty();
         });
 
-        $sender_name = data_get((new GetNamesFromIdsService)->execute([$mail->from])->first(), 'name');
+        $sender_name = data_get((new GetNamesFromIdsService)->execute([$this->mail->from])->first(), 'name');
 
         foreach ($subscriptions as $subscription) {
             $notification = $subscription->notification;
             $notification = new $notification(
-                $mail->from,
+                $this->mail->from,
                 $sender_name,
-                $mail->subject,
-                carbon($mail->timestamp),
+                $this->mail->subject,
+                carbon($this->mail->timestamp),
                 route('character.mails'),
             );
 
             Outbox::create([
                 'notifiable_type' => $subscription->notifiable_type,
                 'notifiable_id' => $subscription->notifiable_id,
-                'notification' => serialize($notification),
-                'is_send' => false,
+                'notification' => $notification,
+                'is_sent' => false,
             ]);
         }
     }
