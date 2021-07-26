@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Seatplus\Notifications\Tests\Integration;
+namespace Seatplus\Notifications\Tests\Stubs;
 
 use Seatplus\Notifications\Tests\TestCase;
 
