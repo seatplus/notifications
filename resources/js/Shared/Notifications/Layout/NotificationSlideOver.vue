@@ -157,14 +157,21 @@
                   <div class="px-4 pt-5 pb-5 sm:px-0 sm:pt-0">
                     <dl class="space-y-8 px-4 sm:px-6 sm:space-y-6">
                       <div>
+                        <dt class="text-sm font-medium text-gray-500 sm:w-40 sm:flex-shrink-0">
+                          Instructions
+                        </dt>
+                        <dd class="mt-1 text-sm text-gray-900 sm:col-span-2">
+                          <p>
+                            Below you will be able to select any affiliated character, corporation or alliance. By doing so, you will get the notifications of selected entity and its hierarchical subordinates.
+                          </p>
+                        </dd>
+                      </div>
+                      <div>
                         <dt class="text-sm font-medium text-gray-500 sm:w-56 sm:flex-shrink-0">
-                          Subscribe to private notifications
+                          Characters:
                         </dt>
                         <dd class="mt-1 text-sm text-gray-900 sm:col-span-2">
                           <fieldset>
-                            <legend class="text-md font-medium text-gray-900">
-                              Characters
-                            </legend>
                             <div class="mt-4 border-t border-b border-gray-200 divide-y divide-gray-200">
                               <div
                                 v-for="(character_id, characterIdx) in characterIds"
@@ -189,6 +196,84 @@
                                     v-model="checkedCharacterIds"
                                     :name="`character-${character_id}`"
                                     :value="character_id"
+                                    type="checkbox"
+                                    class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded"
+                                  >
+                                </div>
+                              </div>
+                            </div>
+                          </fieldset>
+                        </dd>
+                      </div>
+                      <div v-show="corporationIds.length > 0">
+                        <dt class="text-sm font-medium text-gray-500 sm:w-56 sm:flex-shrink-0">
+                          Corporations:
+                        </dt>
+                        <dd class="mt-1 text-sm text-gray-900 sm:col-span-2">
+                          <fieldset>
+                            <div class="mt-4 border-t border-b border-gray-200 divide-y divide-gray-200">
+                              <div
+                                v-for="(corporation_id, corporationIdx) in corporationIds"
+                                :key="corporationIdx"
+                                class="relative flex items-start py-4"
+                              >
+                                <div class="min-w-0 flex-1 text-sm">
+                                  <label
+                                    :for="`corporation-${corporation_id}`"
+                                    class="font-medium text-gray-700 select-none"
+                                  >
+                                    <EntityByIdBlock
+                                      :id="corporation_id"
+                                      :image-size="7"
+                                      name-font-size="md"
+                                    />
+                                  </label>
+                                </div>
+                                <div class="ml-3 flex items-center h-5">
+                                  <input
+                                    :id="`corporation-${corporation_id}`"
+                                    v-model="checkedCorporationIds"
+                                    :name="`corporation-${corporation_id}`"
+                                    :value="corporation_id"
+                                    type="checkbox"
+                                    class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded"
+                                  >
+                                </div>
+                              </div>
+                            </div>
+                          </fieldset>
+                        </dd>
+                      </div>
+                      <div v-show="allianceIds.length > 0">
+                        <dt class="text-sm font-medium text-gray-500 sm:w-56 sm:flex-shrink-0">
+                          Alliances:
+                        </dt>
+                        <dd class="mt-1 text-sm text-gray-900 sm:col-span-2">
+                          <fieldset>
+                            <div class="mt-4 border-t border-b border-gray-200 divide-y divide-gray-200">
+                              <div
+                                v-for="(alliance_id, allianceIdx) in allianceIds"
+                                :key="allianceIdx"
+                                class="relative flex items-start py-4"
+                              >
+                                <div class="min-w-0 flex-1 text-sm">
+                                  <label
+                                    :for="`alliance-${alliance_id}`"
+                                    class="font-medium text-gray-700 select-none"
+                                  >
+                                    <EntityByIdBlock
+                                      :id="alliance_id"
+                                      :image-size="7"
+                                      name-font-size="md"
+                                    />
+                                  </label>
+                                </div>
+                                <div class="ml-3 flex items-center h-5">
+                                  <input
+                                    :id="`alliance-${alliance_id}`"
+                                    v-model="checkedAllianceIds"
+                                    :name="`alliance-${alliance_id}`"
+                                    :value="alliance_id"
                                     type="checkbox"
                                     class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded"
                                   >
@@ -261,20 +346,39 @@ export default {
     emits: ['update:open'],
     setup(props, {emit}) {
 
-        const checkedCharacterIds = ref([])
         const characterIds = ref([])
+        const corporationIds = ref([])
+        const allianceIds = ref([])
+
+        const checkedCharacterIds = ref([])
+        const checkedCorporationIds = ref([])
+        const checkedAllianceIds = ref([])
+
         const currentAffiliations = ref([])
         const form = useForm({
             notification: props.notificationObject.class,
-            notifiable_id: props.notifiable.notifiable_id,
-            notifiable_type: props.notifiable.notifiable_type,
+            notifiable_id: _.get(props.notifiable, 'notifiable_id'),
+            notifiable_type: _.get(props.notifiable, 'notifiable_type'),
         })
 
-        const fetchAffiliatedCharacters = async function () {
+        const fetchAffiliatedEntities = async function (flavour) {
 
-            await axios.post(route('notification.affiliated.characters'), {
+            await axios.post(route(`notification.affiliated.${flavour}s`), {
                 notification: props.notificationObject.class
-            }).then((result) => characterIds.value.push(...result.data))
+            }).then((result) => {
+                switch (flavour) {
+                    case 'character':
+                        characterIds.value.push(...result.data)
+                        break;
+                    case 'corporation':
+                        corporationIds.value.push(...result.data)
+                        break;
+                    case 'alliance':
+                        allianceIds.value.push(...result.data)
+                        break;
+                }
+
+            })
         }
         const fetchCurrentSubscribedEntities = async () => {
             await axios.post(route('notification.current.subscription'), {
@@ -284,6 +388,8 @@ export default {
             }).then((result) => {
                 currentAffiliations.value = result.data
                 checkedCharacterIds.value = result.data.character_ids
+                checkedCorporationIds.value = result.data.corporation_ids
+                checkedAllianceIds.value = result.data.alliance_ids
             })
         }
         const close = function () {
@@ -301,8 +407,8 @@ export default {
         const affiliatedEntities = computed( function() {
             return {
                 character_ids: checkedCharacterIds.value,
-                corporation_ids: [],
-                alliance_ids: []
+                corporation_ids: checkedCorporationIds.value,
+                alliance_ids: checkedAllianceIds.value
             }
         })
         const hasSaveButton = computed(() => {
@@ -316,7 +422,11 @@ export default {
 
         watch(() => props.open, (open) => {
             if(open && _.isEmpty(characterIds.value)) {
-                fetchAffiliatedCharacters()
+                Promise.all([
+                    fetchAffiliatedEntities('character'),
+                    fetchAffiliatedEntities('corporation'),
+                    fetchAffiliatedEntities('alliance')
+                ]).catch(error => console.log(error))
             }
 
             if(open && _.isEmpty(currentAffiliations.value)) {
@@ -329,6 +439,10 @@ export default {
             close,
             checkedCharacterIds,
             characterIds,
+            checkedCorporationIds,
+            corporationIds,
+            checkedAllianceIds,
+            allianceIds,
             hasSaveButton,
             form,
             subscribe
