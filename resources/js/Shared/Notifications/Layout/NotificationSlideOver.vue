@@ -383,8 +383,8 @@ export default {
         const fetchCurrentSubscribedEntities = async () => {
             await axios.post(route('notification.current.subscription'), {
                 notification: props.notificationObject.class,
-                notifiable_id: props.notifiable.notifiable_id,
-                notifiable_type: props.notifiable.notifiable_type,
+                notifiable_id: _.get(props.notifiable, 'notifiable_id'),
+                notifiable_type: _.get(props.notifiable, 'notifiable_type'),
             }).then((result) => {
                 currentAffiliations.value = result.data
                 checkedCharacterIds.value = result.data.character_ids
@@ -429,7 +429,7 @@ export default {
                 ]).catch(error => console.log(error))
             }
 
-            if(open && _.isEmpty(currentAffiliations.value)) {
+            if(open && _.isEmpty(currentAffiliations.value) && props.notifiable) {
                 fetchCurrentSubscribedEntities()
             }
         })
