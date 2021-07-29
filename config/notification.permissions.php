@@ -1,5 +1,6 @@
 <?php
 
 return [
-    'can subscribe to notifications'
+    'can receive notifications',
+    'can subscribe to non-self notifications'
 ];
