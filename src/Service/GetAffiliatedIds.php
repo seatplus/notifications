@@ -9,7 +9,7 @@ use Seatplus\Eveapi\Models\Alliance\AllianceInfo;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 
-class getAffiliatedIds
+class GetAffiliatedIds
 {
 
     protected Collection $ids;
