@@ -27,6 +27,12 @@ class NotificationsController
     public function affiliatedCharacters(Request $request)
     {
 
+        $class = $this->getNotificationClass($request);
+
+        if($class::getCorporationRole()) {
+            return [];
+        }
+
         return $this->getIdsFromFlavour('character', $this->getAffiliatedIds($request));
     }
 
