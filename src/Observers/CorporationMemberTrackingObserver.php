@@ -3,7 +3,6 @@
 
 namespace Seatplus\Notifications\Observers;
 
-
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Eveapi\Models\Corporation\CorporationMemberTracking;
@@ -16,11 +15,10 @@ class CorporationMemberTrackingObserver
 {
     public function created(CorporationMemberTracking $tracking)
     {
-
         $constructor_array = [
             CorporationInfo::find($tracking->corporation_id)?->name ?? $tracking->corporation_id,
             CharacterInfo::find($tracking->character_id)?->name ?? data_get((new GetNamesFromIdsService)->execute([$tracking->character_id])->first(), 'name'),
-            $tracking->start_date
+            $tracking->start_date,
         ];
 
         (new CreateOutboxEntriesFromSubscription(NewCorporationMember::class))
@@ -32,11 +30,10 @@ class CorporationMemberTrackingObserver
         $constructor_array = [
             CorporationInfo::find($tracking->corporation_id)?->name ?? $tracking->corporation_id,
             CharacterInfo::find($tracking->character_id)?->name ?? data_get((new GetNamesFromIdsService)->execute([$tracking->character_id])->first(), 'name'),
-            $tracking->updated_at
+            $tracking->updated_at,
         ];
 
         (new CreateOutboxEntriesFromSubscription(RemoveCorporationMember::class))
             ->handle($tracking->corporation_id, $constructor_array);
     }
-
 }

@@ -42,7 +42,6 @@ class NewEveMail implements ShouldQueue, ShouldBeUnique
 
     public function handle()
     {
-
         if ($this->mail->recipients->isEmpty()) {
             $this->release(30);
         } else {
@@ -59,8 +58,5 @@ class NewEveMail implements ShouldQueue, ShouldBeUnique
                 $constructor_array
             );
         }
-
     }
-
-
 }

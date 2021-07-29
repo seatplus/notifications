@@ -26,10 +26,9 @@ class NotificationsController
 
     public function affiliatedCharacters(Request $request)
     {
-
         $class = $this->getNotificationClass($request);
 
-        if($class::getCorporationRole()) {
+        if ($class::getCorporationRole()) {
             return [];
         }
 
@@ -38,13 +37,11 @@ class NotificationsController
 
     public function affiliatedCorporations(Request $request)
     {
-
         return $this->getIdsFromFlavour('corporation', $this->getAffiliatedIds($request));
     }
 
     public function affiliatedAlliances(Request $request)
     {
-
         return $this->getIdsFromFlavour('alliance', $this->getAffiliatedIds($request));
     }
 
@@ -131,7 +128,6 @@ class NotificationsController
         return $builder->select("{$flavour}_id")
             ->whereIn("{$flavour}_id", $affiliated_ids)
             ->pluck("{$flavour}_id");
-
     }
 
     private function getBuilderFromFlavour(string $flavour): Builder

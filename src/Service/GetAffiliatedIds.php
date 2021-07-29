@@ -3,7 +3,6 @@
 
 namespace Seatplus\Notifications\Service;
 
-
 use Illuminate\Support\Collection;
 use Seatplus\Eveapi\Models\Alliance\AllianceInfo;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
@@ -11,7 +10,6 @@ use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 
 class GetAffiliatedIds
 {
-
     protected Collection $ids;
 
     public function __construct()
