@@ -166,7 +166,7 @@
                           </p>
                         </dd>
                       </div>
-                      <div>
+                      <div v-show="characterIds.length > 0">
                         <dt class="text-sm font-medium text-gray-500 sm:w-56 sm:flex-shrink-0">
                           Characters:
                         </dt>
@@ -368,13 +368,13 @@ export default {
             }).then((result) => {
                 switch (flavour) {
                     case 'character':
-                        characterIds.value.push(...result.data)
+                        characterIds.value = result.data
                         break;
                     case 'corporation':
-                        corporationIds.value.push(...result.data)
+                        corporationIds.value = result.data
                         break;
                     case 'alliance':
-                        allianceIds.value.push(...result.data)
+                        allianceIds.value = result.data
                         break;
                 }
 
