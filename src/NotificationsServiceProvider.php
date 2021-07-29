@@ -3,7 +3,9 @@
 namespace Seatplus\Notifications;
 
 use Illuminate\Support\ServiceProvider;
+use Seatplus\Eveapi\Models\Corporation\CorporationMemberTracking;
 use Seatplus\Eveapi\Models\Mail\Mail;
+use Seatplus\Notifications\Observers\CorporationMemberTrackingObserver;
 use Seatplus\Notifications\Observers\EveMailObserver;
 
 class NotificationsServiceProvider extends ServiceProvider
@@ -69,5 +71,6 @@ class NotificationsServiceProvider extends ServiceProvider
     private function addEventListeners()
     {
         Mail::observe(EveMailObserver::class);
+        CorporationMemberTracking::observe(CorporationMemberTrackingObserver::class);
     }
 }
