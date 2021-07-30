@@ -3,10 +3,14 @@
 
 namespace Seatplus\Notifications\Http\Controllers;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Redirect;
+use Seatplus\Eveapi\Models\Alliance\AllianceInfo;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
+use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Notifications\Models\Subscription;
 
 class NotificationsController
@@ -24,12 +28,21 @@ class NotificationsController
     {
         $class = $this->getNotificationClass($request);
 
-        $affiliated_ids = getAffiliatedIdsByPermission($class::getPermission(), $class::getCorporationRole());
+        if ($class::getCorporationRole()) {
+            return [];
+        }
 
-        return CharacterInfo::query()
-            ->select('character_id')
-            ->whereIn('character_id', $affiliated_ids)
-            ->pluck('character_id');
+        return $this->getIdsFromFlavour('character', $this->getAffiliatedIds($request));
+    }
+
+    public function affiliatedCorporations(Request $request)
+    {
+        return $this->getIdsFromFlavour('corporation', $this->getAffiliatedIds($request));
+    }
+
+    public function affiliatedAlliances(Request $request)
+    {
+        return $this->getIdsFromFlavour('alliance', $this->getAffiliatedIds($request));
     }
 
     public function currentSubscription(Request $request)
@@ -90,6 +103,13 @@ class NotificationsController
         return redirect()->back();
     }
 
+    private function getAffiliatedIds(Request $request) : array
+    {
+        $class = $this->getNotificationClass($request);
+
+        return getAffiliatedIdsByPermission($class::getPermission(), $class::getCorporationRole());
+    }
+
     private function getNotificationClass(Request $request) : string
     {
         $validated_data = $request->validate([
@@ -99,5 +119,23 @@ class NotificationsController
         $class = data_get($validated_data, 'notification');
 
         return $class;
+    }
+
+    private function getIdsFromFlavour(string $flavour, array $affiliated_ids) : Collection
+    {
+        $builder = $this->getBuilderFromFlavour($flavour);
+
+        return $builder->select("{$flavour}_id")
+            ->whereIn("{$flavour}_id", $affiliated_ids)
+            ->pluck("{$flavour}_id");
+    }
+
+    private function getBuilderFromFlavour(string $flavour): Builder
+    {
+        return match ($flavour) {
+            'character' => CharacterInfo::query(),
+            'corporation' => CorporationInfo::query(),
+            'alliance' => AllianceInfo::query(),
+        };
     }
 }
