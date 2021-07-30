@@ -1,22 +1,18 @@
 <?php
 
 use Illuminate\Support\Facades\Event;
-use Seatplus\Eveapi\Models\Corporation\CorporationMemberTracking;
 use function Pest\Laravel\actingAs;
+use Seatplus\Eveapi\Models\Corporation\CorporationMemberTracking;
 
 beforeEach(function () {
-
     $this->test_user->givePermissionTo('superuser');
 
     expect($this->test_user->can('superuser'))->toBeTrue();
-
 });
 
 it('a new member triggers a new createOutboxEntries event', function () {
-
     class NewMember extends \Seatplus\Notifications\Notifications\NewCorporationMember
     {
-
         public static function getIcon(): string
         {
             // TODO: Implement getIcon() method.
@@ -67,17 +63,15 @@ it('a new member triggers a new createOutboxEntries event', function () {
         ->create([
             'character_id' => $this->test_character->character_id,
             'corporation_id' => $this->test_character->corporation->corporation_id,
-            'start_date' => now()->subDay()
+            'start_date' => now()->subDay(),
         ]);
 
     expect(\Seatplus\Notifications\Models\Outbox::all())->toHaveCount(1);
 });
 
 it('a leaving member triggers a new createOutboxEntries event', function () {
-
     class LeavingMember extends \Seatplus\Notifications\Notifications\DeleteCorporationMember
     {
-
         public static function getIcon(): string
         {
             // TODO: Implement getIcon() method.
@@ -124,11 +118,12 @@ it('a leaving member triggers a new createOutboxEntries event', function () {
 
     expect(\Seatplus\Notifications\Models\Outbox::all())->toHaveCount(0);
 
-    Event::fakeFor(fn() => CorporationMemberTracking::factory()
+    Event::fakeFor(
+        fn () => CorporationMemberTracking::factory()
         ->create([
             'character_id' => $this->test_character->character_id,
             'corporation_id' => $this->test_character->corporation->corporation_id,
-            'start_date' => now()->subDay()
+            'start_date' => now()->subDay(),
         ])
     );
 
@@ -137,6 +132,4 @@ it('a leaving member triggers a new createOutboxEntries event', function () {
 
     CorporationMemberTracking::first()->delete();
     expect(\Seatplus\Notifications\Models\Outbox::all())->toHaveCount(1);
-
-
 });
