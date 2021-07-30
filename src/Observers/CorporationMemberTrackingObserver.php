@@ -6,9 +6,9 @@ namespace Seatplus\Notifications\Observers;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Eveapi\Models\Corporation\CorporationMemberTracking;
+use Seatplus\Notifications\Notifications\DeleteCorporationMember;
 use Seatplus\Notifications\Notifications\NewCorporationMember;
 use Seatplus\Notifications\Service\CreateOutboxEntriesFromSubscription;
-use Seatplus\TelegramChannel\Notifications\RemoveCorporationMember;
 use Seatplus\Web\Services\GetNamesFromIdsService;
 
 class CorporationMemberTrackingObserver
@@ -22,10 +22,10 @@ class CorporationMemberTrackingObserver
         ];
 
         (new CreateOutboxEntriesFromSubscription(NewCorporationMember::class))
-            ->handle($tracking->corporation_id, $constructor_array);
+            ->handle([$tracking->corporation_id], $constructor_array);
     }
 
-    private function deleted(CorporationMemberTracking $tracking)
+    public function deleted(CorporationMemberTracking $tracking)
     {
         $constructor_array = [
             CorporationInfo::find($tracking->corporation_id)?->name ?? $tracking->corporation_id,
@@ -33,7 +33,7 @@ class CorporationMemberTrackingObserver
             $tracking->updated_at,
         ];
 
-        (new CreateOutboxEntriesFromSubscription(RemoveCorporationMember::class))
-            ->handle($tracking->corporation_id, $constructor_array);
+        (new CreateOutboxEntriesFromSubscription(DeleteCorporationMember::class))
+            ->handle([$tracking->corporation_id], $constructor_array);
     }
 }
