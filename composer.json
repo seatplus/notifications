@@ -1,10 +1,9 @@
 {
     "name": "seatplus/notifications",
-    "description": ":package_description",
+    "description": "Base notification package which contains all major views and utilities for notifications",
     "keywords": [
-        ":vendor_name",
-        "laravel",
-        "package_slug"
+        "seatplus",
+        "notifications"
     ],
     "homepage": "https://github.com/seatplus/notifications",
     "license": "MIT",
