@@ -39,6 +39,6 @@ class GetAffiliatedIds
                 ...$alliance->characters->pluck('character_id'),
             ]));
 
-        return $this->ids->unique();
+        return $this->ids->flatten()->unique();
     }
 }
