@@ -17,7 +17,8 @@
     ],
     "require": {
         "php": "^8.0",
-        "seatplus/web": "*",
+        "seatplus/web": "^0.8.12",
+        "seatplus/eveapi": "^0.8.16",
         "illuminate/contracts": "^8.37"
     },
     "require-dev": {
