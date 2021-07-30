@@ -42,6 +42,7 @@ class NotificationsController
 
     public function affiliatedAlliances(Request $request)
     {
+
         return $this->getIdsFromFlavour('alliance', $this->getAffiliatedIds($request));
     }
 
